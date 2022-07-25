@@ -9,7 +9,7 @@ import { PageFooter } from "../../components/Page/PageFooter";
 import { useSchedule } from "../../hooks/useSchedule";
 import { Layout } from "../../providers/Layout";
 
-export const scheduleTimeOptionsScreen = (props) => {
+export const ScheduleTimeOptionsScreen = (props) => {
   const { scheduleAt, setScheduleAt } = useSchedule();
 
   return (

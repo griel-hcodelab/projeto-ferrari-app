@@ -6,10 +6,10 @@ type ScheduleProviderProps = {
 };
 
 export const ScheduleProvider = ({ children }: ScheduleProviderProps) => {
-  const [scheduledAt, setScheduleAt] = useState<Date | null>(new Date());
+  const [scheduleAt, setScheduleAt] = useState<Date | null>(new Date());
 
   return (
-    <ScheduleContext.Provider value={{ scheduledAt, setScheduleAt }}>
+    <ScheduleContext.Provider value={{ scheduleAt, setScheduleAt }}>
       {children}
     </ScheduleContext.Provider>
   );
