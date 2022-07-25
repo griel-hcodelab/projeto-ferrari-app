@@ -9,7 +9,7 @@ import { PageFooter } from "../../components/Page/PageFooter";
 import { useSchedule } from "../../hooks/useSchedule";
 import { Layout } from "../../providers/Layout";
 
-export const ScheduleNewScreen = (props) => {
+export const scheduleTimeOptionsScreen = (props) => {
   const { scheduleAt, setScheduleAt } = useSchedule();
 
   return (
@@ -18,13 +18,8 @@ export const ScheduleNewScreen = (props) => {
         <Header onPressBack={() => props.navigation.navigate(Screen.Home)} />
       }
     >
-      <Page title="Escolha a Data" color="blue">
-        <Calendar
-          selected={scheduleAt ? scheduleAt : undefined}
-          onChange={(dt) => setScheduleAt(dt)}
-        />
-      </Page>
-      {/* <Calendar /> */}
+      <Page title="Escolha a Data" color="blue"></Page>
+
       <PageFooter
         buttons={[
           {
