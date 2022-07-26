@@ -1,5 +1,5 @@
 import { format, getDay } from "date-fns";
-import { useCallback, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import styled from "styled-components/native";
 import { Screen } from "../";
 import Calendar from "../../components/Calendar";
@@ -9,44 +9,40 @@ import { BackButton } from "../../components/Page/BackButton";
 import { ContinueButton } from "../../components/Page/ContinueButton";
 import { PageFooter } from "../../components/Page/PageFooter";
 import { PageForm } from "../../components/PageForm";
+import { useDrawerNavigation } from "../../hooks/useDrawerNavigation";
 import { useSchedule } from "../../hooks/useSchedule";
-import { Layout } from "../../providers/Layout";
-import { vars } from "../../values";
-import locale from "date-fns/locale/pt-BR";
-import { ScheduleTimeOptionItem } from "../../components/ScheduleTimeOptionItem";
-import { TimeOption } from "../../types/TimeOption";
-import axios from "axios";
-import { useApp } from "../../hooks/useApp";
-import { useScreenFocus } from "../../utils/useScreenFocus";
-import { useNavigation } from "@react-navigation/native";
-import { ScheduleServiceProvider } from "../../providers/ScheduleService";
 import { useScheduleService } from "../../hooks/useScheduleService";
+import { Layout } from "../../providers/Layout";
+import { ScheduleServiceProvider } from "../../providers/ScheduleService";
 import { formatCurrency } from "../../utils/formatCurrency";
+import { vars } from "../../values";
 
 const ScheduleServiceItemWrap = styled.TouchableOpacity`
   flex-direction: row;
+  margin-bottom: ${vars.spacePx};
 `;
 const ScheduleServiceInput = styled.View`
   width: 22px;
   height: 22px;
   margin-right: ${vars.spacePx};
-  border: 1px solid ${vars.gray3};
-  align-items: center;
+  border: ${vars.gray3} 1px solid;
   justify-content: center;
+  align-items: center;
 `;
 const ScheduleServiceInputChecked = styled.View`
   width: 14px;
   height: 14px;
   background-color: ${vars.blue};
 `;
+
 const ScheduleServiceLabel = styled.View``;
 const ScheduleServiceTitle = styled.Text`
   color: ${vars.dark0};
   font-size: 16px;
 `;
-const ScheduleServiceSubTitle = styled.Text`
-  color: ${vars.gray2};
+const ScheduleServiceSubtitle = styled.Text`
   font-size: 14px;
+  color: ${vars.gray2};
 `;
 const ScheduleServicePrice = styled.Text`
   color: ${vars.dark0};
@@ -61,6 +57,7 @@ type ScheduleServiceItemProps = {
   selected?: boolean;
   onChange?: (selected: boolean) => void;
 };
+
 const ScheduleServiceItem = ({
   title,
   subtitle,
@@ -68,7 +65,7 @@ const ScheduleServiceItem = ({
   selected = false,
   onChange,
 }: ScheduleServiceItemProps) => {
-  const [isSelected, setIsSelected] = useState(false);
+  const [isSelected, setIsSelected] = useState(selected);
 
   useEffect(() => {
     if (typeof onChange === "function") {
@@ -84,17 +81,16 @@ const ScheduleServiceItem = ({
       <ScheduleServiceLabel>
         <ScheduleServiceTitle>{title}</ScheduleServiceTitle>
         {subtitle && (
-          <ScheduleServiceSubTitle>{subtitle}</ScheduleServiceSubTitle>
+          <ScheduleServiceSubtitle>{subtitle}</ScheduleServiceSubtitle>
         )}
-        <ScheduleServicePrice>
-          R${formatCurrency(Number(price))}
-        </ScheduleServicePrice>
+        <ScheduleServicePrice>{formatCurrency(price)}</ScheduleServicePrice>
       </ScheduleServiceLabel>
     </ScheduleServiceItemWrap>
   );
 };
 
-const ScheduleService = (props) => {
+const ScheduleServie = () => {
+  const { navigate } = useDrawerNavigation();
   const { services } = useScheduleService();
   const {
     scheduleAt,
@@ -105,8 +101,8 @@ const ScheduleService = (props) => {
     removeService,
   } = useSchedule();
 
-  const onChangeService = useCallback((checked: boolean, id: number) => {
-    if (checked) {
+  const onChangeService = useCallback((checkd: boolean, id: number) => {
+    if (checkd) {
       addService(id);
     } else {
       removeService(id);
@@ -114,69 +110,47 @@ const ScheduleService = (props) => {
   }, []);
 
   return (
-    <>
-      <Page title="Escolha os Serviços" color="blue">
+    <Fragment>
+      <Page title="escolha os serviços" color="blue">
         <PageForm>
           {services.map(({ id, name, description, price }) => (
             <ScheduleServiceItem
               key={id}
               title={name}
-              price={Number(price)}
               subtitle={description}
+              price={Number(price)}
               selected={servicesId.includes(id)}
               onChange={(checked) => onChangeService(checked, id)}
             />
           ))}
         </PageForm>
       </Page>
-
       <PageFooter
         buttons={[
           {
             ...BackButton,
-            onPress: () => props.navigation.navigate(Screen.ScheduleNew),
+            onPress: () => navigate(Screen.ScheduleNew),
           },
           {
             ...ContinueButton,
-            onPress: () => props.navigation.navigate(Screen.ScheduleServices),
+            onPress: () => navigate(Screen.ScheduleTimeOptions),
           },
         ]}
       />
-    </>
+    </Fragment>
   );
 };
 
-export const ScheduleServicesScreen = (props) => {
-  const { scheduleAt, timeOptionId, setTimeOptionId } = useSchedule();
+export const ScheduleServicesScreen = () => {
+  const { navigate } = useDrawerNavigation();
 
   return (
     <Layout
-      header={
-        <Header
-          onPressBack={() => props.navigation.navigate(Screen.ScheduleNew)}
-        />
-      }
+      header={<Header onPressBack={() => navigate(Screen.ScheduleNew)} />}
     >
       <ScheduleServiceProvider>
-        <ScheduleService />
+        <ScheduleServie />
       </ScheduleServiceProvider>
     </Layout>
   );
 };
-
-const ScheduleTimeOptionTitle = styled.Text`
-  color: ${vars.gray9};
-  font-size: 16px;
-  text-transform: uppercase;
-`;
-const ScheduleTimeOptionSelectedDate = styled.Text`
-  font-size: 20px;
-  text-transform: uppercase;
-  color: ${vars.black};
-  font-weight: bold;
-`;
-const ScheduleTimeOptionList = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-  flex-wrap: wrap;
-`;
