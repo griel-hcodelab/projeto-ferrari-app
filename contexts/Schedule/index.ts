@@ -5,6 +5,10 @@ type ScheduleContextType = {
   setScheduleAt: (date: Date | null) => void;
   timeOptionId: number | null;
   setTimeOptionId: (timeOptionId: number | null) => void;
+  services: any;
+  setServices: (services: number[]) => void;
+  addService: (serviceId: number) => void;
+  removeService: (serviceId: number) => void;
 };
 
 export const ScheduleContext = createContext<ScheduleContextType>({
@@ -12,4 +16,8 @@ export const ScheduleContext = createContext<ScheduleContextType>({
   setScheduleAt: () => {},
   timeOptionId: null,
   setTimeOptionId: () => {},
+  services: [],
+  setServices: () => {},
+  addService: () => {},
+  removeService: () => {},
 });

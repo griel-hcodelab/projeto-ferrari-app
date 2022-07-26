@@ -19,19 +19,116 @@ import axios from "axios";
 import { useApp } from "../../hooks/useApp";
 import { useScreenFocus } from "../../utils/useScreenFocus";
 import { useNavigation } from "@react-navigation/native";
+import { ScheduleServiceProvider } from "../../providers/ScheduleService";
+import { useScheduleService } from "../../hooks/useScheduleService";
+import { formatCurrency } from "../../utils/formatCurrency";
 
-export const ScheduleServicesScreen = (props) => {
-  const { scheduleAt, timeOptionId, setTimeOptionId } = useSchedule();
+const ScheduleServiceItemWrap = styled.TouchableOpacity`
+  flex-direction: row;
+`;
+const ScheduleServiceInput = styled.View`
+  width: 22px;
+  height: 22px;
+  margin-right: ${vars.spacePx};
+  border: 1px solid ${vars.gray3};
+  align-items: center;
+  justify-content: center;
+`;
+const ScheduleServiceInputChecked = styled.View`
+  width: 14px;
+  height: 14px;
+  background-color: ${vars.blue};
+`;
+const ScheduleServiceLabel = styled.View``;
+const ScheduleServiceTitle = styled.Text`
+  color: ${vars.dark0};
+  font-size: 16px;
+`;
+const ScheduleServiceSubTitle = styled.Text`
+  color: ${vars.gray2};
+  font-size: 14px;
+`;
+const ScheduleServicePrice = styled.Text`
+  color: ${vars.dark0};
+  font-size: 16px;
+  font-weight: bold;
+`;
+
+type ScheduleServiceItemProps = {
+  title: string;
+  subtitle?: string;
+  price: number;
+  selected?: boolean;
+  onChange?: (selected: boolean) => void;
+};
+const ScheduleServiceItem = ({
+  title,
+  subtitle,
+  price,
+  selected = false,
+  onChange,
+}: ScheduleServiceItemProps) => {
+  const [isSelected, setIsSelected] = useState(false);
+
+  useEffect(() => {
+    if (typeof onChange === "function") {
+      onChange(isSelected);
+    }
+  }, [isSelected]);
 
   return (
-    <Layout
-      header={
-        <Header
-          onPressBack={() => props.navigation.navigate(Screen.ScheduleNew)}
-        />
-      }
-    >
-      <Page title="Escolha os Serviços" color="blue"></Page>
+    <ScheduleServiceItemWrap onPress={() => setIsSelected(!isSelected)}>
+      <ScheduleServiceInput>
+        {isSelected && <ScheduleServiceInputChecked />}
+      </ScheduleServiceInput>
+      <ScheduleServiceLabel>
+        <ScheduleServiceTitle>{title}</ScheduleServiceTitle>
+        {subtitle && (
+          <ScheduleServiceSubTitle>{subtitle}</ScheduleServiceSubTitle>
+        )}
+        <ScheduleServicePrice>
+          R${formatCurrency(Number(price))}
+        </ScheduleServicePrice>
+      </ScheduleServiceLabel>
+    </ScheduleServiceItemWrap>
+  );
+};
+
+const ScheduleService = (props) => {
+  const { services } = useScheduleService();
+  const {
+    scheduleAt,
+    timeOptionId,
+    setTimeOptionId,
+    services: servicesId,
+    addService,
+    removeService,
+  } = useSchedule();
+
+  const onChangeService = useCallback((checked: boolean, id: number) => {
+    if (checked) {
+      addService(id);
+    } else {
+      removeService(id);
+    }
+  }, []);
+
+  return (
+    <>
+      <Page title="Escolha os Serviços" color="blue">
+        <PageForm>
+          {services.map(({ id, name, description, price }) => (
+            <ScheduleServiceItem
+              key={id}
+              title={name}
+              price={Number(price)}
+              subtitle={description}
+              selected={servicesId.includes(id)}
+              onChange={(checked) => onChangeService(checked, id)}
+            />
+          ))}
+        </PageForm>
+      </Page>
 
       <PageFooter
         buttons={[
@@ -45,6 +142,24 @@ export const ScheduleServicesScreen = (props) => {
           },
         ]}
       />
+    </>
+  );
+};
+
+export const ScheduleServicesScreen = (props) => {
+  const { scheduleAt, timeOptionId, setTimeOptionId } = useSchedule();
+
+  return (
+    <Layout
+      header={
+        <Header
+          onPressBack={() => props.navigation.navigate(Screen.ScheduleNew)}
+        />
+      }
+    >
+      <ScheduleServiceProvider>
+        <ScheduleService />
+      </ScheduleServiceProvider>
     </Layout>
   );
 };
