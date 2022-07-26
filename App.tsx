@@ -12,6 +12,7 @@ import { AppProvider } from "./providers/App";
 import { ProfileScreen } from "./screens/ProfileScreen";
 import { ScheduleProvider } from "./providers/Schedule";
 import { ScheduleTimeOptionsScreen } from "./screens/ScheduleTimeOptions";
+import { ScheduleServicesScreen } from "./screens/ScheduleServicesScreeen";
 
 const Drawer = createDrawerNavigator<typeof Screens>();
 
@@ -41,6 +42,10 @@ export default function App() {
               <Drawer.Screen
                 name={Screen.ScheduleTimeOptions}
                 component={ScheduleTimeOptionsScreen}
+              />
+              <Drawer.Screen
+                name={Screen.ScheduleServices}
+                component={ScheduleServicesScreen}
               />
               <Drawer.Screen name={Screen.Auth} component={AuthScreen} />
               <Drawer.Screen name={Screen.Profile} component={ProfileScreen} />
