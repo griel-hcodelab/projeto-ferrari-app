@@ -13,9 +13,9 @@ export const ScheduleProvider = ({ children }: ScheduleProviderProps) => {
   const addService = useCallback(
     (serviceId: number) => {
       const service = services.find((id) => id === serviceId);
-      if (!service) {
-        setServices([...services, serviceId]);
-      }
+      const newServices: number[] = [...services];
+      newServices.push(serviceId);
+      setServices(newServices);
     },
     [services]
   );

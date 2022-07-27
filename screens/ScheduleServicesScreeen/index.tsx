@@ -1,7 +1,9 @@
+import { MaterialIcons } from "@expo/vector-icons";
 import { format, getDay } from "date-fns";
 import { Fragment, useCallback, useEffect, useState } from "react";
 import styled from "styled-components/native";
 import { Screen } from "../";
+import { Button } from "../../components/Button";
 import Calendar from "../../components/Calendar";
 import { Header } from "../../components/Header";
 import { Page } from "../../components/Page";
@@ -9,6 +11,7 @@ import { BackButton } from "../../components/Page/BackButton";
 import { ContinueButton } from "../../components/Page/ContinueButton";
 import { PageFooter } from "../../components/Page/PageFooter";
 import { PageForm } from "../../components/PageForm";
+import { ScheduleServiceItem } from "../../components/ScheduleServiceItem";
 import { useDrawerNavigation } from "../../hooks/useDrawerNavigation";
 import { useSchedule } from "../../hooks/useSchedule";
 import { useScheduleService } from "../../hooks/useScheduleService";
@@ -16,80 +19,22 @@ import { Layout } from "../../providers/Layout";
 import { ScheduleServiceProvider } from "../../providers/ScheduleService";
 import { formatCurrency } from "../../utils/formatCurrency";
 import { vars } from "../../values";
+import { Dimensions } from "react-native";
+import { ScheduleServicePanelProvider } from "../../providers/ScheduleServicePanel";
+import { usePanel } from "../../hooks/usePanel";
+import { ScheduleServiceBody } from "../../components/ScheduleServiceBody";
+import { ScheduleServicePanelFooter } from "../../components/ScheduleServicePanelFooter";
 
-const ScheduleServiceItemWrap = styled.TouchableOpacity`
-  flex-direction: row;
-  margin-bottom: ${vars.spacePx};
-`;
-const ScheduleServiceInput = styled.View`
-  width: 22px;
-  height: 22px;
-  margin-right: ${vars.spacePx};
-  border: ${vars.gray3} 1px solid;
-  justify-content: center;
-  align-items: center;
-`;
-const ScheduleServiceInputChecked = styled.View`
-  width: 14px;
-  height: 14px;
-  background-color: ${vars.blue};
-`;
-
-const ScheduleServiceLabel = styled.View``;
-const ScheduleServiceTitle = styled.Text`
-  color: ${vars.dark0};
-  font-size: 16px;
-`;
-const ScheduleServiceSubtitle = styled.Text`
-  font-size: 14px;
-  color: ${vars.gray2};
-`;
-const ScheduleServicePrice = styled.Text`
-  color: ${vars.dark0};
-  font-size: 16px;
-  font-weight: bold;
-`;
-
-type ScheduleServiceItemProps = {
-  title: string;
-  subtitle?: string;
-  price: number;
-  selected?: boolean;
-  onChange?: (selected: boolean) => void;
-};
-
-const ScheduleServiceItem = ({
-  title,
-  subtitle,
-  price,
-  selected = false,
-  onChange,
-}: ScheduleServiceItemProps) => {
-  const [isSelected, setIsSelected] = useState(selected);
-
-  useEffect(() => {
-    if (typeof onChange === "function") {
-      onChange(isSelected);
-    }
-  }, [isSelected]);
-
+const ScheduleServicePanel = () => {
   return (
-    <ScheduleServiceItemWrap onPress={() => setIsSelected(!isSelected)}>
-      <ScheduleServiceInput>
-        {isSelected && <ScheduleServiceInputChecked />}
-      </ScheduleServiceInput>
-      <ScheduleServiceLabel>
-        <ScheduleServiceTitle>{title}</ScheduleServiceTitle>
-        {subtitle && (
-          <ScheduleServiceSubtitle>{subtitle}</ScheduleServiceSubtitle>
-        )}
-        <ScheduleServicePrice>{formatCurrency(price)}</ScheduleServicePrice>
-      </ScheduleServiceLabel>
-    </ScheduleServiceItemWrap>
+    <>
+      <ScheduleServiceBody />
+      <ScheduleServicePanelFooter />
+    </>
   );
 };
 
-const ScheduleServie = () => {
+const ScheduleService = () => {
   const { navigate } = useDrawerNavigation();
   const { services } = useScheduleService();
   const {
@@ -125,6 +70,9 @@ const ScheduleServie = () => {
           ))}
         </PageForm>
       </Page>
+      <ScheduleServicePanelProvider>
+        <ScheduleServicePanel />
+      </ScheduleServicePanelProvider>
       <PageFooter
         buttons={[
           {
@@ -149,7 +97,7 @@ export const ScheduleServicesScreen = () => {
       header={<Header onPressBack={() => navigate(Screen.ScheduleNew)} />}
     >
       <ScheduleServiceProvider>
-        <ScheduleServie />
+        <ScheduleService />
       </ScheduleServiceProvider>
     </Layout>
   );
